@@ -166,9 +166,14 @@ class PredictionWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 print(f"  PK: {node.pk}")
                 print(f"  UUID: {node.uuid}")
                 print(f"\nCheck status with: verdi process list")
+                print(f"Or view results in Step 4 with PK: {node.pk}")
                 
                 self.status.value = f"<p style='color: green;'>✓ {display_name} submitted (PK: {node.pk})</p>"
                 self.model.calculation_node = node
+                
+                # Store PK for results step (if main app model is available)
+                if hasattr(self, '_app_model') and hasattr(self._app_model, 'results_model'):
+                    self._app_model.results_model.calculation_pk = node.pk
                 
             except Exception as e:
                 print(f"❌ Error submitting calculation: {e}")
