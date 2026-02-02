@@ -1,4 +1,4 @@
-"""MLIP training wizard step."""
+"""MLIP model selection wizard step."""
 
 import aiidalab_widgets_base as awb
 import ipywidgets as ipw
@@ -6,11 +6,11 @@ import traitlets
 
 
 class TrainingWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
-    """Wizard step for MLIP training."""
+    """Wizard step for MLIP model selection."""
 
     def __init__(self, model, **kwargs):
         """
-        Initialize training wizard step.
+        Initialize model selection wizard step.
 
         Parameters
         ----------
@@ -19,89 +19,160 @@ class TrainingWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
         """
         self.model = model
 
-        self.title = ipw.HTML("<h3>Step 2: Train MLIP Model</h3>")
+        self.title = ipw.HTML("<h3>Step 2: Select MLIP Model</h3>")
         
-        self.model_selector = ipw.Dropdown(
+        self.mode_selector = ipw.ToggleButtons(
+            options=[
+                ('Use Pre-trained Model', 'pretrained'),
+                ('Train Custom Model', 'train')
+            ],
+            value='pretrained',
+            description='Mode:',
+            button_style='info'
+        )
+        self.mode_selector.observe(self._on_mode_change, names='value')
+        
+        # Pre-trained model selection
+        self.pretrained_selector = ipw.Dropdown(
+            options=[
+                ('MACE-MP-0 (small) - Fast, general materials', 'mace_mp_small'),
+                ('MACE-MP-0 (medium) - Balanced', 'mace_mp_medium'),
+                ('MACE-MP-0 (large) - Accurate, slow', 'mace_mp_large'),
+            ],
+            value='mace_mp_small',
+            description='Pre-trained:',
+            layout=ipw.Layout(width='500px')
+        )
+        
+        self.pretrained_info = ipw.HTML(
+            """
+            <p><b>Pre-trained models</b> are ready to use immediately.</p>
+            <p>MACE-MP-0 models are trained on the Materials Project database
+            and work well for general materials screening.</p>
+            <p>✓ No training data required<br>
+            ✓ Fast setup<br>
+            ✓ Good for initial exploration</p>
+            """
+        )
+        
+        # Training section
+        self.model_type_selector = ipw.Dropdown(
             options=['MACE', 'M3GNET', 'CHGNET'],
             value='MACE',
-            description='Model Type:',
+            description='Architecture:',
         )
-        self.model_selector.observe(self._on_model_change, names='value')
         
-        self.info = ipw.HTML(
+        self.training_info = ipw.HTML(
             """
-            <p>Select the machine learning potential model to train.</p>
-            <p>Supported models:</p>
+            <p><b>Custom training</b> requires your own training data.</p>
+            <p>You need:</p>
             <ul>
-                <li><b>MACE</b>: Multi-Atomic Cluster Expansion</li>
-                <li><b>M3GNET</b>: Materials 3-body Graph Network</li>
-                <li><b>CHGNET</b>: Crystal Hamiltonian Graph Neural Network</li>
+                <li>Training dataset (XYZ format with energies/forces)</li>
+                <li>Validation dataset</li>
+                <li>Test dataset (optional)</li>
             </ul>
+            <p>Training can take hours to days depending on data size.</p>
             """
         )
         
         self.train_button = ipw.Button(
-            description='Start Training',
-            button_style='primary',
-            disabled=True
+            description='Configure Training',
+            button_style='warning',
+            disabled=False
         )
         self.train_button.on_click(self._on_train_click)
         
+        self.continue_button = ipw.Button(
+            description='Continue with Pre-trained Model →',
+            button_style='success',
+            disabled=False
+        )
+        self.continue_button.on_click(self._on_continue_click)
+        
         self.status = ipw.HTML()
         self.output = ipw.Output()
+        
+        # Container for mode-specific widgets
+        self.mode_area = ipw.VBox()
+        self._update_mode_area()
 
         super().__init__(
             children=[
                 self.title,
-                self.info,
-                self.model_selector,
-                self.train_button,
+                self.mode_selector,
+                self.mode_area,
                 self.status,
                 self.output
             ],
             **kwargs
         )
     
-    def _on_model_change(self, change):
-        """Handle model type selection."""
-        self.model.model_type = change['new']
-        self.status.value = f"<p>Selected {change['new']} architecture</p>"
-        self.train_button.disabled = False
+    def _on_mode_change(self, change):
+        """Handle mode selection change."""
+        self._update_mode_area()
+    
+    def _update_mode_area(self):
+        """Update the displayed widgets based on selected mode."""
+        if self.mode_selector.value == 'pretrained':
+            self.mode_area.children = [
+                self.pretrained_info,
+                self.pretrained_selector,
+                self.continue_button
+            ]
+            self.model.model_type = 'MACE'
+            self.status.value = "<p style='color: green;'>✓ Ready to use pre-trained model</p>"
+        else:
+            self.mode_area.children = [
+                self.training_info,
+                self.model_type_selector,
+                self.train_button
+            ]
+            self.status.value = "<p style='color: orange;'>⚠ Training setup required</p>"
+    
+    def _on_continue_click(self, button):
+        """Handle continue with pre-trained model."""
+        model_name = self.pretrained_selector.value
+        with self.output:
+            self.output.clear_output()
+            print(f"✓ Selected pre-trained model: {model_name}")
+            print("\nThis model will be automatically downloaded when you run calculations in Step 3.")
+            print("You can now proceed to Step 3 to run predictions!")
+        
+        self.status.value = f"<p style='color: green;'>✓ Using {model_name}</p>"
     
     def _on_train_click(self, button):
         """Handle train button click."""
         with self.output:
             self.output.clear_output()
-            print(f"Training {self.model.model_type} model...")
+            print("⚠ Custom training is not yet implemented in the web interface.")
             print()
-            print("To implement training, you need:")
-            print("1. Install aiida-mlip in the container")
-            print("2. Prepare training data (train/valid/test XYZ files)")
-            print("3. Create JanusConfigfile with training parameters")
-            print("4. Submit aiida_mlip.calculations.train.Train CalcJob")
+            print("To train a custom MLIP model, you can use the aiida-mlip Python API:")
             print()
-            print("Example code:")
+            print("1. Prepare your training data in XYZ format with energy/force labels")
+            print()
+            print("2. Create a training configuration:")
             print("```python")
             print("from aiida import orm, engine")
             print("from aiida_mlip.calculations.train import Train")
             print("from aiida_mlip.data.config import JanusConfigfile")
-            print("from aiida_mlip.data.model import ModelData")
             print()
-            print("# Create config with training parameters")
             print("config = JanusConfigfile({")
             print("    'name': 'my_model',")
-            print("    'train_file': '/path/to/train.xyz',")
-            print("    'valid_file': '/path/to/valid.xyz',")
-            print("    'test_file': '/path/to/test.xyz',")
-            print("    'arch': 'mace',  # or 'm3gnet', 'chgnet'")
+            print("    'train_file': 'train.xyz',")
+            print("    'valid_file': 'valid.xyz',")
+            print("    'arch': 'mace',")
+            print("    'energy_weight': 1.0,")
+            print("    'forces_weight': 10.0,")
             print("})")
             print()
-            print("# Submit training")
             print("builder = Train.get_builder()")
+            print("builder.code = orm.load_code('janus@localhost')")
             print("builder.mlip_config = config")
-            print("builder.fine_tune = orm.Bool(False)")
-            print("builder.metadata.options.resources = {'num_machines': 1}")
             print("node = engine.submit(builder)")
             print("```")
+            print()
+            print("3. Monitor training with: verdi process list")
+            print()
+            print("For now, continue with a pre-trained model!")
             
-            self.status.value = "<p style='color: orange;'>⚠ Training requires aiida-mlip installation and training data</p>"
+            self.status.value = "<p style='color: orange;'>⚠ Use pre-trained models or Python API for training</p>"
