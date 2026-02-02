@@ -39,3 +39,4 @@ class ResultsModel(traitlets.HasTraits):
     """Model for results viewing."""
 
     selected_calculation = traitlets.Instance(klass=object, allow_none=True)
+    calculation_pk = traitlets.Int(default_value=0)
