@@ -49,9 +49,9 @@ class TrainingWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
             <p><b>Pre-trained models</b> are ready to use immediately.</p>
             <p>MACE-MP-0 models are trained on the Materials Project database
             and work well for general materials screening.</p>
-            <p>✓ No training data required<br>
-            ✓ Fast setup<br>
-            ✓ Good for initial exploration</p>
+            <p>No training data required<br>
+            Fast setup<br>
+            Good for initial exploration</p>
             """
         )
         
@@ -120,31 +120,31 @@ class TrainingWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 self.continue_button
             ]
             self.model.model_type = 'MACE'
-            self.status.value = "<p style='color: green;'>✓ Ready to use pre-trained model</p>"
+            self.status.value = "<p style='color: green;'>Ready to use pre-trained model</p>"
         else:
             self.mode_area.children = [
                 self.training_info,
                 self.model_type_selector,
                 self.train_button
             ]
-            self.status.value = "<p style='color: orange;'>⚠ Training setup required</p>"
+            self.status.value = "<p style='color: orange;'>Warning: Training setup required</p>"
     
     def _on_continue_click(self, button):
         """Handle continue with pre-trained model."""
         model_name = self.pretrained_selector.value
         with self.output:
             self.output.clear_output()
-            print(f"✓ Selected pre-trained model: {model_name}")
+            print(f"Selected pre-trained model: {model_name}")
             print("\nThis model will be automatically downloaded when you run calculations in Step 3.")
             print("You can now proceed to Step 3 to run predictions!")
         
-        self.status.value = f"<p style='color: green;'>✓ Using {model_name}</p>"
+        self.status.value = f"<p style='color: green;'>Using {model_name}</p>"
     
     def _on_train_click(self, button):
         """Handle train button click."""
         with self.output:
             self.output.clear_output()
-            print("⚠ Custom training is not yet implemented in the web interface.")
+            print("Warning: Custom training is not yet implemented in the web interface.")
             print()
             print("To train a custom MLIP model, you can use the aiida-mlip Python API:")
             print()
@@ -175,4 +175,4 @@ class TrainingWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
             print()
             print("For now, continue with a pre-trained model!")
             
-            self.status.value = "<p style='color: orange;'>⚠ Use pre-trained models or Python API for training</p>"
+            self.status.value = "<p style='color: orange;'>Warning: Use pre-trained models or Python API for training</p>"

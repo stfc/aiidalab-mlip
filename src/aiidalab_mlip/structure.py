@@ -78,7 +78,7 @@ class StructureWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
             self.model.filename = filename
             
             # Update status
-            self.status.value = f"<p style='color: green;'>✓ Loaded {filename}: {len(structure)} atoms</p>"
+            self.status.value = f"<p style='color: green;'>Loaded {filename}: {len(structure)} atoms</p>"
             
             # Display structure info
             with self.structure_viewer:

@@ -96,7 +96,7 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
             self.process_list_area.clear_output()
             
             if not AIIDA_AVAILABLE:
-                print("❌ AiiDA not available")
+                print("Error: AiiDA not available")
                 return
             
             try:
@@ -117,13 +117,13 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                     self.process_selector.options = []
                     return
                 
-                print("📋 Recent Calculations:\n")
+                print("Recent Calculations:\n")
                 print(f"{'PK':<6} {'Type':<15} {'State':<12} {'Exit':<6} {'Created'}")
                 print("-" * 70)
                 
                 options = []
                 for pk, ctime, label, state, exit_status in results:
-                    status_icon = "✓" if exit_status == 0 else "✗" if exit_status else "⏳"
+                    status_icon = "OK" if exit_status == 0 else "ERR" if exit_status else "RUN"
                     time_str = ctime.strftime("%Y-%m-%d %H:%M")
                     print(f"{pk:<6} {label:<15} {state or 'N/A':<12} {status_icon:<6} {time_str}")
                     
@@ -157,14 +157,14 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
             self.results_area.clear_output()
             
             if not AIIDA_AVAILABLE:
-                print("❌ AiiDA not available")
-                self.status.value = "<p style='color: red;'>❌ AiiDA not installed</p>"
+                print("Error: AiiDA not available")
+                self.status.value = "<p style='color: red;'>Error: AiiDA not installed</p>"
                 return
             
             pk = self.pk_input.value
             if pk <= 0:
-                print("❌ Please enter a valid process PK")
-                self.status.value = "<p style='color: red;'>❌ Invalid PK</p>"
+                print("Error: Please enter a valid process PK")
+                self.status.value = "<p style='color: red;'>Error: Invalid PK</p>"
                 return
             
             try:
@@ -180,14 +180,14 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 
                 # Check if calculation finished successfully
                 if node.exit_status != 0:
-                    print(f"⚠ Calculation exited with status {node.exit_status}")
-                    self.status.value = f"<p style='color: orange;'>⚠ Exit status: {node.exit_status}</p>"
+                    print(f"Warning: Calculation exited with status {node.exit_status}")
+                    self.status.value = f"<p style='color: orange;'>Warning: Exit status: {node.exit_status}</p>"
                     return
                 
                 # Get outputs
                 if 'results_dict' not in node.outputs:
-                    print("❌ No results_dict output found")
-                    self.status.value = "<p style='color: red;'>❌ No results available</p>"
+                    print("Error: No results_dict output found")
+                    self.status.value = "<p style='color: red;'>Error: No results available</p>"
                     return
                 
                 results = node.outputs.results_dict.get_dict()
@@ -201,7 +201,7 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 
                 if energy_key:
                     energy = results['info'][energy_key]
-                    print(f"📊 Energy: {energy:.6f} eV")
+                    print(f"Energy: {energy:.6f} eV")
                     print(f"   ({energy / len(results['positions']):.6f} eV/atom)\n")
                 
                 # Display forces info
@@ -215,7 +215,7 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                     forces = results[force_key]
                     import numpy as np
                     force_magnitudes = np.linalg.norm(forces, axis=1)
-                    print(f"⚡ Forces:")
+                    print(f"Forces:")
                     print(f"   Max: {force_magnitudes.max():.4f} eV/Å")
                     print(f"   Mean: {force_magnitudes.mean():.4f} eV/Å")
                     print(f"   RMS: {np.sqrt((force_magnitudes**2).mean()):.4f} eV/Å\n")
@@ -229,12 +229,12 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 
                 if stress_key:
                     stress = results['info'][stress_key]
-                    print(f"💎 Stress tensor: {stress}\n")
+                    print(f"Stress tensor: {stress}\n")
                 
                 # Display structure info
                 n_atoms = len(results['positions'])
                 elements = set(results['numbers'])
-                print(f"🔬 Structure:")
+                print(f"Structure:")
                 print(f"   Atoms: {n_atoms}")
                 print(f"   Elements: {', '.join(map(str, sorted(elements)))}")
                 print(f"   PBC: {results.get('pbc', 'N/A')}\n")
@@ -251,19 +251,19 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                         pbc=results.get('pbc', [True, True, True])
                     )
                     
-                    print("🔍 Structure Visualization:")
+                    print("Structure Visualization:")
                     view = nglview.show_ase(atoms)
                     view.add_unitcell()
                     view.add_ball_and_stick()
                     display(view)
                     
                 except Exception as e:
-                    print(f"⚠ Could not display structure: {e}")
+                    print(f"Warning: Could not display structure: {e}")
                 
-                self.status.value = f"<p style='color: green;'>✓ Loaded results for PK {pk}</p>"
+                self.status.value = f"<p style='color: green;'>Loaded results for PK {pk}</p>"
                 
             except Exception as e:
-                print(f"❌ Error loading results: {e}")
+                print(f"Error loading results: {e}")
                 import traceback
                 traceback.print_exc()
-                self.status.value = f"<p style='color: red;'>❌ Failed to load results</p>"
+                self.status.value = f"<p style='color: red;'>Error: Failed to load results</p>"

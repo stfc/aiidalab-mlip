@@ -92,16 +92,16 @@ class PredictionWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
             self.output.clear_output()
             
             if not AIIDA_MLIP_AVAILABLE:
-                print("❌ aiida-mlip not available. Install with:")
+                print("Error: aiida-mlip not available. Install with:")
                 print("   pip install aiida-mlip")
-                self.status.value = "<p style='color: red;'>❌ aiida-mlip not installed</p>"
+                self.status.value = "<p style='color: red;'>Error: aiida-mlip not installed</p>"
                 return
             
             # Get structure from Step 1 (passed via main.py observer)
             structure = getattr(self, '_parent_structure', None)
             if structure is None:
-                print("❌ No structure uploaded. Please go to Step 1 and upload a structure.")
-                self.status.value = "<p style='color: red;'>❌ No structure available</p>"
+                print("Error: No structure uploaded. Please go to Step 1 and upload a structure.")
+                self.status.value = "<p style='color: red;'>Error: No structure available</p>"
                 return
             
             calc_type = self.model.calculation_type
@@ -116,9 +116,9 @@ class PredictionWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 try:
                     code = orm.load_code('janus@localhost')
                 except Exception:
-                    print("❌ Code 'janus@localhost' not found. Setting up...")
+                    print("Error: Code 'janus@localhost' not found. Setting up...")
                     print("   Run: verdi code create core.code.installed --config janus.yml")
-                    self.status.value = "<p style='color: red;'>❌ Code not configured</p>"
+                    self.status.value = "<p style='color: red;'>Error: Code not configured</p>"
                     return
                 
                 # Download and create model
@@ -150,8 +150,8 @@ class PredictionWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                     display_name = "Single Point"
                     
                 elif calc_type == 'md':
-                    print("❌ MD calculations not yet implemented")
-                    self.status.value = "<p style='color: orange;'>⚠ MD coming soon</p>"
+                    print("Error: MD calculations not yet implemented")
+                    self.status.value = "<p style='color: orange;'>Warning: MD coming soon</p>"
                     return
                 
                 # Set computation resources
@@ -162,13 +162,13 @@ class PredictionWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 print(f"Submitting {display_name}...")
                 node = engine.submit(builder)
                 
-                print(f"✓ Submitted successfully!")
+                print(f"Submitted successfully!")
                 print(f"  PK: {node.pk}")
                 print(f"  UUID: {node.uuid}")
                 print(f"\nCheck status with: verdi process list")
                 print(f"Or view results in Step 4 with PK: {node.pk}")
                 
-                self.status.value = f"<p style='color: green;'>✓ {display_name} submitted (PK: {node.pk})</p>"
+                self.status.value = f"<p style='color: green;'>{display_name} submitted (PK: {node.pk})</p>"
                 self.model.calculation_node = node
                 
                 # Store PK for results step (if main app model is available)
@@ -176,7 +176,7 @@ class PredictionWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                     self._app_model.results_model.calculation_pk = node.pk
                 
             except Exception as e:
-                print(f"❌ Error submitting calculation: {e}")
+                print(f"Error submitting calculation: {e}")
                 import traceback
                 traceback.print_exc()
-                self.status.value = f"<p style='color: red;'>❌ Submission failed</p>"
+                self.status.value = f"<p style='color: red;'>Error: Submission failed</p>"
