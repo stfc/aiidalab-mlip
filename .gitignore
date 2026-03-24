@@ -1,0 +1,13 @@
+*.egg*
+*.swo
+*.swp
+*~
+.*.ipynb
+.DS_Store
+.ipynb_checkpoints/*
+.vscode
+__pycache__/
+~*
+DEVELOPMENT.md
+INSTALLATION.md
+USER_GUIDE.md

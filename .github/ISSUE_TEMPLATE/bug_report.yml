@@ -1,0 +1,82 @@
+name: Bug report
+description: Report incorrect behavior in aiidalab-mlip
+labels:
+  - type: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please include enough information to reproduce and diagnose the issue.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Bug summary
+      description: What happened and what did you expect?
+      placeholder: Describe expected versus actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide deterministic steps.
+      placeholder: |
+        1. Go to...
+        2. Upload...
+        3. Run...
+        4. Observe...
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: AiiDAlab image tag, Python version, aiida-mlip version, browser.
+      placeholder: stable, py3.9, aiida-mlip commit SHA, Firefox 123
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error logs and traceback
+      description: Paste relevant logs and tracebacks.
+      render: shell
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - critical
+        - high
+        - medium
+        - low
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - ui
+        - workflow
+        - aiida
+        - aiida-mlip-integration
+        - results
+        - docs
+        - ci
+        - infra
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: User impact
+      description: How many users/workflows are affected and any workaround.
+      placeholder: Describe scope and workaround if available.
+  - type: textarea
+    id: fix-idea
+    attributes:
+      label: Suspected root cause or fix idea
+      description: Optional, if known.

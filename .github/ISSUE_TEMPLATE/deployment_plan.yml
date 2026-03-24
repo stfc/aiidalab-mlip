@@ -1,0 +1,54 @@
+name: Deployment plan
+description: Plan and track deployment to staging or production
+labels:
+  - type: deployment
+body:
+  - type: dropdown
+    id: target
+    attributes:
+      label: Deployment target
+      options:
+        - staging
+        - production
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.2.0 or commit SHA
+    validations:
+      required: true
+  - type: textarea
+    id: prechecks
+    attributes:
+      label: Pre-deployment checks
+      value: |
+        - [ ] CI green
+        - [ ] Release checklist completed
+        - [ ] Required services available (DB, broker)
+        - [ ] Backup/restore verified
+        - [ ] Rollback procedure ready
+    validations:
+      required: true
+  - type: textarea
+    id: rollout
+    attributes:
+      label: Rollout steps
+      placeholder: Ordered deployment steps with owners.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Post-deployment validation
+      placeholder: Smoke tests and observability checks.
+    validations:
+      required: true
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback trigger and plan
+      placeholder: Define failure thresholds and rollback actions.
+    validations:
+      required: true
