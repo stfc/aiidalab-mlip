@@ -1,5 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: Documentation
-    url: https://github.com/stfc/aiidalab-mlip/blob/main/README.md
-    about: Read setup and usage documentation before opening an issue.
