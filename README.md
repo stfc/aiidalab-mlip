@@ -3,15 +3,17 @@
 Interactive web interface for running Machine Learning Interatomic Potential (MLIP) calculations using [AiiDA](https://www.aiida.net/) and [aiida-mlip](https://github.com/stfc/aiida-mlip).
 
 ## Quick Start
+Currently under development 
 
 ### Prerequisites
-- Docker or local Python 3.9+ environment with `uv` an
-- AiiDA installed with branch compatible with python 3.9 https://github.com/JessieGould/aiida-mlip/tree/python39-compat
+- Docker and Aiidalab https://aiidalab.readthedocs.io/en/latest/usage/access/index.html 
+- Local Python 3.9+ environment with `uv` venv see guidance at https://stfc.github.io/aiida-mlip/developer_guide/index.html 
+- AiiDA-MLIP installed from branch compatible with python 3.9 https://github.com/JessieGould/aiida-mlip/tree/python39-compat (for Aiidalab compatibility) 
 
 
 ### Installation
 
-**Option 1: Docker (Recommended)**
+**Docker**
 
 ```bash
 # Clone the repository
@@ -32,19 +34,6 @@ pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
 pip install -e /home/jovyan/aiida-mlip
 pip install -e /home/jovyan/apps/aiidalab-mlip
 exit
-```
-
-**Option 2: Local Installation (with existing AiiDA setup)**
-
-```bash
-# Create and activate UV venv
-uv venv mlip-env
-source mlip-env/bin/activate
-
-# Install dependencies
-uv pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
-uv pip install -e /path/to/aiida-mlip
-uv pip install -e .
 ```
 
 ## Access
@@ -70,3 +59,9 @@ MIT
 - **Issues**: https://github.com/stfc/aiidalab-mlip/issues
 - **aiida-mlip**: https://github.com/stfc/aiida-mlip
 
+
+## Funding
+
+Contributors to this project were funded by
+
+PSDI ALC CoSeC
