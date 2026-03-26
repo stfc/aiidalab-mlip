@@ -68,13 +68,6 @@ docker exec aiidalab-mlip verdi code create core.code.installed -n --config /tmp
 docker exec aiidalab-mlip verdi daemon restart
 ```
 
-Verify setup:
-
-```bash
-docker exec aiidalab-mlip verdi status
-docker exec aiidalab-mlip verdi code list
-docker exec aiidalab-mlip python -c "from aiidalab_mlip.main import MainApp; print('ok')"
-```
 
 ### Access
 
@@ -88,13 +81,6 @@ Get token if prompted:
 
 ```bash
 docker logs aiidalab-mlip 2>&1 | grep "token=" | tail -1
-```
-
-### Persistent Container Usage
-
-```bash
-docker stop aiidalab-mlip
-docker start aiidalab-mlip
 ```
 
 ## Architecture
