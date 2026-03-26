@@ -202,7 +202,6 @@ class ResultsWizardStep(ipw.VBox, awb.WizardAppWidgetStep):
                 if energy_key:
                     energy = results['info'][energy_key]
                     print(f"Energy: {energy:.6f} eV")
-                    print(f"   ({energy / len(results['positions']):.6f} eV/atom)\n")
                 
                 # Display forces info
                 force_key = None
