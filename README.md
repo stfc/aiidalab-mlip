@@ -97,26 +97,6 @@ docker stop aiidalab-mlip
 docker start aiidalab-mlip
 ```
 
-## Troubleshooting
-
-**Error: `Code 'janus@localhost' not found`**
-
-- Re-run code registration:
-  `docker exec aiidalab-mlip verdi code create core.code.installed -n --config /tmp/config_code.yml`
-- Confirm with:
-  `docker exec aiidalab-mlip verdi code list`
-
-**Error: `ModuleNotFoundError: No module named 'aiida_mlip'`**
-
-- Reinstall plugin in container:
-  `docker exec aiidalab-mlip pip install -e /home/jovyan/aiida-mlip`
-- Restart daemon:
-  `docker exec aiidalab-mlip verdi daemon restart`
-
-**GeomOpt exits with status `305` and Janus reports `--write-traj` unknown**
-
-- Ensure your `aiida-mlip` checkout contains the Janus CLI compatibility fix (`--traj` instead of `--write-traj`).
-
 ## Architecture
 
 This app uses a wizard-style MVC pattern:
