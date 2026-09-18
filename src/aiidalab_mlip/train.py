@@ -1,37 +1,35 @@
-"""Defines the main AiiDAlab MLIP application page."""
+"""Defines the main AiiDAlab MLIP training page."""
+
 from datetime import datetime
 
 import aiidalab_widgets_base as awb
 import ipywidgets as ipw
 from IPython.display import display
 
-from aiidalab_mlip.common.navigation import QuickAccessButtons
-from aiidalab_mlip.models.main import MainAppModel
+from aiidalab_mlip.models import TrainingModel
 from aiidalab_mlip.steps import (
+    DistributeWizardStep,
     ModelWizardStep,
+    MultiStructureStep,
     ResultsWizardStep,
     RunWizardStep,
-    # TrainingWizardStep,
-    StructureWizardStep,
-    TaskWizardStep,
 )
 
 
-class MainApp:
+class TrainApp:
     """The main AiiDAlab MLIP application class."""
 
     def __init__(self) -> None:
         """MainApp constructor."""
-        self.model = MainAppModel()
-        self.view = MainAppView(self.model)
+        self.model = TrainingModel()
+        self.view = TrainAppView(self.model)
         display(self.view)
 
 
-class MainAppView(ipw.VBox):
-    """The main app view."""
+class TrainAppView(ipw.VBox):
+    """Training app."""
 
-    def __init__(self, model: MainAppModel, **kwargs) -> None:
-        """MainAppView constructor."""
+    def __init__(self, model: TrainingModel, **kwargs) -> None:
         logo = ipw.HTML(
             """
             <div class="app-container logo" style="text-align: center;">
@@ -49,8 +47,6 @@ class MainAppView(ipw.VBox):
             """
         )
 
-        nav_btns = QuickAccessButtons()
-
         header = ipw.VBox(
             children=[
                 logo,
@@ -67,15 +63,15 @@ class MainAppView(ipw.VBox):
             """,
         )
 
-        self.main = MLIPWizardWidget(model)
+        self.main = TrainWizardWidget(model)
 
-        super().__init__(layout={}, children=[header, nav_btns, self.main, footer], **kwargs)
+        super().__init__(layout={}, children=[header, self.main, footer], **kwargs)
 
 
-class MLIPWizardWidget(ipw.VBox):
-    """Widget to hold the main MLIP application wizard."""
+class TrainWizardWidget(ipw.VBox):
+    """Widget to hold the main MLIP training application wizard."""
 
-    def __init__(self, model: MainAppModel, **kwargs) -> None:
+    def __init__(self, model: TrainingModel, **kwargs) -> None:
         """
         WizardWidget constructor.
 
@@ -86,11 +82,12 @@ class MLIPWizardWidget(ipw.VBox):
         **kwargs :
             Keyword arguments passed to ipywidgets.VBox.__init__()
         """
-        self.structure_step = StructureWizardStep(model.structure_model)
-        self.model_step = ModelWizardStep(model.mlip_model)
-        self.task_step = TaskWizardStep(model.task_model)
+        self.structure_step = MultiStructureStep(model)
+        self.model_step = ModelWizardStep(model.code)
+        self.distribute_step = DistributeWizardStep(model)
+        # self.task_step = TaskWizardStep(model.task_model)
         self.run_step = RunWizardStep(model)
-        self.results_step = ResultsWizardStep()
+        # self.results_step = ResultsWizardStep(model.results_model)
 
         # Link structure to prediction step
         # def update_prediction_structure(change: dict[str, Atoms]) -> None:
@@ -102,10 +99,10 @@ class MLIPWizardWidget(ipw.VBox):
             steps=[
                 ("Select Structure", self.structure_step),
                 ("Select model", self.model_step),
-                ("Select task", self.task_step),
+                ("Distribute data", self.distribute_step),
                 # ("Train MLIP", self.training_step),
                 ("Run", self.run_step),
-                ("View Results", self.results_step),
+                # ("View Results", self.results_step),
             ],
         )
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import ipywidgets as ipw
 
 template = """
@@ -9,8 +7,8 @@ template = """
 <tr>
   <td valign="top"><ul>
     <li><a href="{appbase}/main.ipynb" target="_blank">Launch MLIP App</a></li>
-    <li><a href="{appbase}/example.ipynb" target="_blank">Simple Example</a></li>
-    <li>Train and deploy ML potentials for molecular simulations</li>
+    <!-- <li><a href="{appbase}/train.ipynb" target="_blank">Train and deploy
+ML potentials for molecular simulations</a></li> -->
   </ul></td>
 </tr>
 </table>
