@@ -57,4 +57,8 @@ Built with:
 
 ## Funding
 
-Contributors to this project were funded by PSDI ALC CoSeC.
+Contributors to this project were funded by
+
+[![PSDI](https://raw.githubusercontent.com/stfc/aiida-mlip/main/docs/source/images/psdi-100.webp)](https://www.psdi.ac.uk/)
+[<img src="https://raw.githubusercontent.com/stfc/aiida-mlip/main/docs/source/images/alc.svg" width="200" height="100" alt="ALC" />](https://adalovelacecentre.ac.uk/)
+[![CoSeC](https://raw.githubusercontent.com/stfc/aiida-mlip/main/docs/source/images/cosec-100.webp)](https://www.scd.stfc.ac.uk/Pages/CoSeC.aspx)
