@@ -53,7 +53,6 @@ Built with:
 - [AiiDAlab](https://www.materialscloud.org/aiidalab) - Interactive interface
 - [aiida-mlip](https://github.com/stfc/aiida-mlip) - MLIP calculations
 - [janus-core](https://github.com/stfc/janus-core) - MLIP backend
-- [MACE](https://github.com/ACEsuit/mace) - Machine learning models
 
 ## Funding
 
