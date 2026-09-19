@@ -10,92 +10,18 @@ This app is under active development. Current supported calculations are Singlep
 - **Pre-trained Models**: Use MACE-MP-0 models trained on Materials Project.
 - **Singlepoint Calculations**: Compute energy, forces, and stress tensors.
 - **Geometry Optimization**: Relax structures to local minima.
+- **Molecular dynamics**: molecular dynamics
 - **Interactive Results**: View outputs and process metadata.
 - **Automatic Provenance**: Full workflow tracking with AiiDA.
 
 ## Quick Start
 
+For detailed instructions on running and developing the application locally via Docker/Podman or `aiidalab-launch`, see the [Containers Guide](containers/README.md).
 
 ### Guidance
-- For advice on using Aiidalab (including Docker) https://aiidalab.readthedocs.io/en/latest/usage/access/index.html and https://stfc.github.io/alc-ux/user_docs/index.html 
-- For advice on using Aiida-MLIP (Including `uv` virtual environment) https://stfc.github.io/aiida-mlip/developer_guide/index.html 
-- Aiidalab currently supports Python 3.9 so a compatable image of Aiida-MLIP can be found at https://github.com/JessieGould/aiida-mlip/tree/python39-compat
-
-
-### Installation (Docker)
-
-Run these commands on the **host machine**.
-
-```bash
-# Clone repositories side by side
-git clone https://github.com/stfc/aiidalab-mlip.git
-git clone -b python39-compat https://github.com/JessieGould/aiida-mlip.git
-
-cd aiidalab-mlip
-
-# Start container with both repos mounted
-docker run -d \
-  --name aiidalab-mlip \
-  -p 8888:8888 \
-  -v "$(pwd)":/home/jovyan/apps/aiidalab-mlip \
-  -v "$(cd ../aiida-mlip && pwd)":/home/jovyan/aiida-mlip \
-  aiidalab/full-stack:edge
-```
-
-Now install dependencies **inside the container**:
-
-```bash
-docker exec -it aiidalab-mlip bash
-
-pip install torch==2.2.0 --index-url https://download.pytorch.org/whl/cpu
-pip install -e /home/jovyan/aiida-mlip
-pip install -e /home/jovyan/apps/aiidalab-mlip
-
-exit
-```
-
-### Configure AiiDA Code (Required)
-
-`aiida-mlip` expects a configured code entry called `janus@localhost`.
-
-`config_code.yml` is expected from the `aiida-mlip` repo root. If missing, generate it from the aiida-mlip setup tutorial. 
-
-Run on the **host machine**:
-
-```bash
-docker cp ../aiida-mlip/config_code.yml aiidalab-mlip:/tmp/config_code.yml
-docker exec aiidalab-mlip verdi code create core.code.installed -n --config /tmp/config_code.yml
-docker exec aiidalab-mlip verdi daemon restart
-```
-
-
-### Access
-
-Open:
-
-```text
-http://localhost:8888
-```
-
-Get token if prompted:
-
-```bash
-docker logs aiidalab-mlip 2>&1 | grep "token=" | tail -1
-```
-
-## Architecture
-
-This app uses a wizard-style MVC pattern:
-
-```text
-src/aiidalab_mlip/
-├── process.py      # Data models (traitlets-based state)
-├── structure.py    # Step 1: Structure upload
-├── training.py     # Step 2: Model selection
-├── prediction.py   # Step 3: Calculation submission
-├── results.py      # Step 4: Results visualization
-└── main.py         # App entry point and wizard setup
-```
+- For running locally via Docker/Podman: see [containers/README.md](containers/README.md).
+- For advice on using Aiidalab (including Docker): https://aiidalab.readthedocs.io/en/latest/usage/access/index.html and https://stfc.github.io/alc-ux/user_docs/index.html
+- For advice on using Aiida-MLIP (Including `uv` virtual environment): https://stfc.github.io/aiida-mlip/developer_guide/index.html
 
 ## License
 
