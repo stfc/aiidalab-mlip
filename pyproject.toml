@@ -39,6 +39,9 @@ dependencies = [
 
 [project.optional-dependencies]
 rdkit = ["rdkit"]
+tests = [
+    "pytest>=7.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/stfc/aiidalab-mlip"
@@ -127,3 +130,9 @@ override_SS05 = [  # override SS05 to allow docstrings starting with these words
     '^Access ',
     '^Class ',
 ]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-v -p no:pytest-qt"

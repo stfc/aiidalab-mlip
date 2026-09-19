@@ -1,5 +1,8 @@
 """AiiDAlab MLIP application package."""
 
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 
-__version__ = version("aiidalab_mlip")
+try:
+    __version__ = version("aiidalab-mlip")
+except PackageNotFoundError:
+    __version__ = "unknown"

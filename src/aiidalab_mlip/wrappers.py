@@ -29,5 +29,5 @@ def err_handler(own: HasStatus, act: str) -> Generator[None, None, None]:
     """Handle error, writing to message buffer."""
     try:
         yield
-    except Exception as err:
-        own.status.failure(f"✗ Error in {act}: {format_exc(err)}")
+    except Exception:
+        own.status.failure(f"✗ Error in {act}: {format_exc()}")
