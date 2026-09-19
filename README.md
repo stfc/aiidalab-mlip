@@ -16,6 +16,18 @@ This app is under active development. Current supported calculations are Singlep
 
 ## Quick Start
 
+Run the container using Podman and open `http://localhost:8888`:
+
+```bash
+podman run -it --rm -p 8888:8888 ghcr.io/stfc/aiidalab-mlip:amd64-latest
+```
+
+Alternatively, use the provided startup script (which handles permissions, volume persistence, and profile setup automatically):
+
+```bash
+./containers/startup.sh --image ghcr.io/stfc/aiidalab-mlip:amd64-latest
+```
+
 For detailed instructions on running and developing the application locally via Docker/Podman or `aiidalab-launch`, see the [Containers Guide](containers/README.md).
 
 ### Guidance
@@ -25,7 +37,7 @@ For detailed instructions on running and developing the application locally via 
 
 ## License
 
-MIT
+BSD 3-Clause License
 
 ## Contact
 

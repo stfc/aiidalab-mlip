@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aiidalab-mlip"
-version = "0.0.1a1"
+version = "0.1.0a1"
 authors = [
     {name = "Jessica Gould"},
     {name = "Jacob Wilkins", email = "jacob.wilkins@stfc.ac.uk"}
@@ -13,12 +13,12 @@ description = "Run MLIPs through AiiDALab."
 readme = "README.md"
 requires-python = ">=3.10,<=3.12"
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Development Status :: 1 - Planning"
 ]
-license = {text = "MIT"}
+license = {text = "BSD-3-Clause"}
 dependencies = [
     "aiidalab>=21.09.0",
     "aiida-mlip",
@@ -41,10 +41,10 @@ dependencies = [
 rdkit = ["rdkit"]
 
 [project.urls]
-Homepage = "https://github.com/aiidalab/aiidalab-mlip"
-Logo = "https://raw.githubusercontent.com/aiidalab/aiidalab-mlip/main/img/logo.png"
-Documentation = "https://github.com/aiidalab/aiidalab-mlip/#readme"
-"Bug Tracker" = "https://github.com/aiidalab/aiidalab-mlip/issues"
+Homepage = "https://github.com/stfc/aiidalab-mlip"
+Logo = "https://raw.githubusercontent.com/stfc/aiidalab-mlip/main/img/logo.png"
+Documentation = "https://github.com/stfc/aiidalab-mlip#readme"
+"Bug Tracker" = "https://github.com/stfc/aiidalab-mlip/issues"
 
 [tool.ruff]
 line-length = 100
