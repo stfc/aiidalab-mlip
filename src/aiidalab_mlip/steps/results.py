@@ -145,7 +145,12 @@ class ResultsWizardStep(Step, WizardAppWidgetStep):
             options = []
 
             for pk, ctime, label, _state, exit_status in results:
-                status_icon = "OK" if exit_status == 0 else "ERR" if exit_status else "RUN"
+                if exit_status == 0:
+                    status_icon = "OK"
+                elif _state in ("created", "waiting", "running"):
+                    status_icon = "RUN"
+                else:
+                    status_icon = f"ERR ({exit_status})"
                 time_str = ctime.strftime("%Y-%m-%d %H:%M")
 
                 # Add to select options
@@ -177,7 +182,10 @@ class ResultsWizardStep(Step, WizardAppWidgetStep):
             self.node_tree.value = node.uuid
 
             # Check if calculation finished successfully
-            if node.exit_status != 0:
+            if not node.is_finished:
+                self.status.warning(f"Calculation is currently {node.process_state.value}...")
+                return
+            if node.exit_status not in (0, None):
                 self.status.failure(f"Calculation exited with status: {node.exit_status}")
                 return
 
