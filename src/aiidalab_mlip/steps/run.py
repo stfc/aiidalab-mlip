@@ -4,7 +4,6 @@ import ipywidgets as ipw
 from aiida import engine, orm
 from aiida_mlip.calculations.geomopt import GeomOpt
 from aiida_mlip.calculations.md import MD
-from aiida_mlip.calculations.phonon import Phonons
 from aiida_mlip.calculations.singlepoint import Singlepoint
 from alc_aiidalab_widgets.layouts import WizardStep
 from ipywidgets import link
@@ -13,8 +12,6 @@ from aiidalab_mlip.models import MainAppModel
 
 
 class RunWizardStep(WizardStep):
-    """Main step for starting calculation."""
-
     def __init__(self, model: MainAppModel, **kwargs):
         """
         Initialize prediction wizard step.
@@ -119,16 +116,6 @@ class RunWizardStep(WizardStep):
                     builder.md_kwargs = orm.Dict(
                         {key: val for key, val in task_parameters.items() if val is not None}
                     )
-                case "Phonon":
-                    builder = Phonons.get_builder()
-                    builder.supercell = orm.Str(task_parameters["supercell"])
-                    builder.n_qpoints = orm.Int(task_parameters["n_qpoints"])
-                    builder.displacement = orm.Float(task_parameters["displacement"])
-                    builder.symmetrize = orm.Bool(task_parameters["symmetrize"])
-                    builder.no_hdf5 = orm.Bool(task_parameters["no_hdf5"])
-                    for op in ("dos", "pdos", "bands"):
-                        setattr(builder, op, op in task_parameters["ops"])
-
                 case _:
                     raise NotImplementedError(f"Cannot calculate {calc_type}.")
 

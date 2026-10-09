@@ -1,14 +1,15 @@
 """Defines the process history applicaion page."""
+
 from datetime import datetime
 
+from aiidalab_widgets_base import ProcessNodesTreeWidget
 import ipywidgets as ipw
 from aiida_mlip.calculations.geomopt import GeomOpt
 from aiida_mlip.calculations.md import MD
-from aiida_mlip.calculations.phonon import Phonons
 from aiida_mlip.calculations.singlepoint import Singlepoint
-from aiidalab_widgets_base import ProcessNodesTreeWidget
 from alc_aiidalab_widgets.widgets import AiiDADatabaseQueryWidget
 from IPython.display import display
+from traitlets import HasTraits, Unicode
 
 from aiidalab_mlip.common.navigation import QuickAccessButtons
 from aiidalab_mlip.common.node_viewers import CustomAiidaNodeViewWidget
@@ -87,7 +88,6 @@ class HistoryAppView(ipw.VBox):
                 GeomOpt,
                 Singlepoint,
                 MD,
-                Phonons,
             ],
         )
         self.lookup_widget.observe(self._update_node_view, "data_object")

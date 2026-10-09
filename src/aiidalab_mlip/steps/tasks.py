@@ -26,7 +26,6 @@ class TaskWizardStep(WizardStep):
         self.spe = SPETask()
         self.geom = GeomOptTask()
         self.md = MDTask()
-        self.phonon = PhononTask()
 
         self.tabs = tab_from_dict(
             ipw.Tab,
@@ -34,7 +33,6 @@ class TaskWizardStep(WizardStep):
                 "Single Point": self.spe,
                 "Geometry Optimise": self.geom,
                 "Molecular Dynamics": self.md,
-                "Phonon": self.phonon,
             },
         )
 
@@ -46,8 +44,7 @@ class TaskWizardStep(WizardStep):
         )
         self.ok()
 
-    def submit(self, b: ipw.Button) -> None:
-        """Submit the task with the current parameters."""
+    def submit(self, b) -> None:
         self.running()
         self.model.task = self.tabs.get_title(self.tabs.selected_index)
         self.model.task_parameters = self.tabs.children[self.tabs.selected_index].get()
@@ -57,8 +54,6 @@ class TaskWizardStep(WizardStep):
 
 
 class SPETask(ParameterStep):
-    """Task for computing single point energies."""
-
     def __init__(self) -> None:
         self.properties_widget = MultiSelect(
             options=["energy", "forces", "stress", "hessian"],
@@ -466,65 +461,3 @@ class MDTask(ParameterStep):
 
                 if tt.value == 50:
                     tt.value = 100
-
-
-class PhononTask(ParameterStep):
-    def __init__(self):
-        widgets = {
-            "supercell": ipw.Text(
-                description="Supercell:",
-                help=(
-                    "Supercell matrix, in the Phonopy style. Must be passed as a string "
-                    "in one of three forms: single integer ('2'), which specifies all "
-                    "diagonal elements; three integers ('1 2 3'), which specifies each "
-                    "individual diagonal element; or nine values ('1 2 3 4 5 6 7 8 9'), "
-                    "which specifies all elements, filling the matrix row-wise."
-                ),
-                default="1"
-            ),
-            "n_qpoints": ipw.BoundedIntText(
-                description="N Q-Points:", help="Number of q-points to sample.",
-                default=51,
-                min=1,
-            ),
-            "displacement": ipw.BoundedFloatText(
-                description="Displacement",
-                help="Finite displacement distance in Å",
-                min=1e-9,
-                default=0.01,
-            ),
-            "ops": MultiSelect(
-                options=["dos", "pdos", "bands"],
-                description="Operations",
-            ),
-            "symmetrize": CheckButton(
-                value=True,
-                description="Symmetrise",
-                icon="check",
-                help="Symmetrise the cell before starting.",
-            ),
-            # "qpoints": Optional(ipw.FileUpload()),
-            "no_hdf5": CheckButton(
-                value=False,
-                description="yaml output",
-                icon="check",
-                help="Don't output as HDF5, use phonopy YAML format.",
-            ),
-        }
-
-        super().__init__(
-            title="Phonon",
-            info="Phonon calculation",
-            widgets=widgets,
-            default_args={
-                "default": {
-                    "n_qpoints": 51,
-                    "supercell": "1",
-                    "ops": {"dos", "pdos", "bands"},
-                    "displacement": 0.01,
-                    "symmetrize": True,
-                    "no_hdf5": True,
-                }
-            },
-            submittable=False,
-        )

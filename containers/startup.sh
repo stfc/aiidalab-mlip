@@ -139,14 +139,12 @@ if [[ "$ENGINE" == "podman" || "$ENGINE" == "docker" ]]; then
         fi
     fi
     echo "=== Running AiiDAlab MLIP with ${ENGINE} (image: $IMAGE) ==="
-
     exec "$ENGINE" run -it --rm \
-         "${port_args[@]}" \
-         "${extra_args[@]}" \
-         -v "${BIND}:/home/jovyan:Z" \
-         "${AIIDA_ENV[@]}" \
-         "$IMAGE"
-
+        "${port_args[@]}" \
+        "${extra_args[@]}" \
+        -v "${BIND}:/home/jovyan:Z" \
+        "${AIIDA_ENV[@]}" \
+        "$IMAGE"
 else
     apptainer_args=(--compat --cleanenv --home /home/jovyan --bind "${BIND}:/home/jovyan")
     if [[ "$USE_GPU" == 1 ]]; then

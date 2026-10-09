@@ -1,15 +1,13 @@
-"""Node displays in node tree."""
-
-import re
 import traceback
 from typing import Any, TypeVar
 
 import ipywidgets as ipw
 import numpy as np
 import yaml
-from aiida.common import NotExistentAttributeError
 from aiida.orm import (
+    ArrayData,
     Dict,
+    Float,
     Node,
     ProcessNode,
     SinglefileData,
@@ -20,8 +18,6 @@ from aiidalab_widgets_base.loaders import LoadingWidget
 from aiidalab_widgets_base.viewers import AIIDA_VIEWER_MAPPING, DictViewer
 from alc_aiidalab_widgets.types import CallbackDict
 from alc_aiidalab_widgets.widgets import Status, StructureViewWidget
-from alc_aiidalab_widgets.widgets.tables import GenericArrayDataTableWidget
-from alc_aiidalab_widgets.widgets.vib_modes import VibrationalModesViewWidget
 from ase import Atoms
 from IPython.display import display
 from traitlets import Instance, observe
@@ -29,36 +25,106 @@ from traitlets import Instance, observe
 T = TypeVar("T")
 
 
+class AiidaGradientDataViewWidget(ipw.VBox):
+    """Custom widget to display array data produced from AiiDA-mlip jobs."""
+
+    def __init__(self, array: ArrayData, **kwargs):
+        """AiidaArrayDataViewWidget Constructor.
+
+        Parameters
+        ----------
+        array : ArrayData
+            The AiiDA ArrayData object to display.
+        """
+        super().__init__(**kwargs)
+        self.array = array
+        self.array_names = array.get_arraynames()
+
+        self.array_selector = ipw.Dropdown(
+            options=self.array_names,
+            description="Array Label:",
+            disabled=False,
+            layout={"width": "30%"},
+        )
+        self._render_array({"new": self.array_selector.index, "old": -1})
+        self.array_selector.observe(self._render_array, "index")
+
+    def _render_array(self, change) -> None:
+        """Create a HTML table based on the currently selected array."""
+        index = change["new"]
+        if index == change["old"]:
+            return
+        values = self.array.get_array(self.array_names[index])
+        # Construct HTML Table
+        html = "<table style='width:100%; border: 1px solid #ddd; text-align: left; "
+        html += "border-collapse: collapse;'>"
+        html += "<tr style='background-color: #2196F3; color: white;'>"
+        html += "<th>Atom Index</th><th>X</th><th>Y</th><th>Z</th></tr>"
+
+        for idx, row in enumerate(values):
+            bg_color = "#f9f9f9" if idx % 2 == 0 else "#ffffff"
+            html += f"<tr style='background-color: {bg_color};'>"
+            html += f"<td><b>{idx}</b></td><td>{row[0]:.6f}</td><td>{row[1]:.6f}</td>"
+            html += f"<td>{row[2]:.6f}</td>"
+            html += "</tr>"
+        html += "</table>"
+
+        self.children = [self.array_selector, ipw.HTML(html)]
+
+
+class VibrationalModesViewWidget(ipw.VBox):
+    """Custom widget to display vibrational modes produced from ChemShell."""
+
+    def __init__(self, array: ArrayData, **kwargs) -> None:
+        """VibrationalModesViewWidget Constructor.
+
+        Parameters
+        ----------
+        array : ArrayData
+            The AiiDA ArrayData object to display.
+        """
+        super().__init__(**kwargs)
+        self.array = array
+        values = self.array.get_array("Modes")
+        # Construct HTML Table
+        html = "<table style='width:100%; border: 1px solid #ddd; text-align: left; "
+        html += "border-collapse: collapse;'>"
+        html += "<tr style='background-color: #2196F3; color: white;'>"
+        html += "<th>Mode</th><th>Frequency</th><th>Vib T / K</th><th>ZPE / H</th>"
+        html += "</th><th>Energy / H</th></th><th>-TS / H</th></tr>"
+
+        for idx, row in enumerate(values):
+            bg_color = "#f9f9f9" if idx % 2 == 0 else "#ffffff"
+            html += f"<tr style='background-color: {bg_color};'>"
+            html += f"<td><b>{idx}</b></td><td>{row[0]:.6f}</td><td>{row[1]:.6f}</td>"
+            html += f"<td>{row[2]:.6f}</td><td>{row[3]:.6f}</td><td>{row[4]:.6f}</td>"
+            html += "</tr>"
+        html += "</table>"
+
+        self.children = [ipw.HTML(html)]
+
+
 class SummaryViewer(ipw.VBox):
-    def __init__(self, node: ProcessNode, **kwargs) -> None:
+    def __init__(self, node, **kwargs) -> None:
+
+        results = node.outputs.results_dict.get_dict()
 
         textbox = ipw.HTML()
         children = [textbox]
 
         text = []
+
         text.append(
             f"""\
 === Calculation Results ===
 Type: {node.process_label}
-State: {node.process_state.value}
-            """
-        )
-
-        if node.process_state.value in {"finished", "excepted", "killed"}:
-            text.append(
-                f"""\
+State: {node.process_state}
 Exit status: {node.exit_status}
 Created: {node.ctime}
 Finished: {node.mtime}
-                """
-            )
 
-        try:
-            results = node.outputs.results_dict.get_dict()
-        except NotExistentAttributeError:
-            textbox.value = "<br>".join(text).replace("\n", "<br>")
-            super().__init__(children=children, **kwargs)
-            return
+"""
+        )
 
         # Display energy
         if (energy := self._get_dict_ci(results.get("info", {}), "energy")) is not None:
@@ -118,12 +184,42 @@ Structure:
         return next((d[dkey] for dkey in d if key in dkey.lower()), None)
 
 
+class AiiDAMLIPStatsViewer(ipw.HTML):
+    DEFAULT_STYLE = """
+    <style>
+    table, th, td { border: 1px solid black; }
+    tr:nth-child(odd) { background-color: #e5e7e9; }
+    tr:nth-child(odd):hover { background-color:   #f5b7b1; }
+    tr:nth-child(even):hover { background-color:  #f5b7b1; }
+    th, td { padding: 10px; }
+    td { min-width: 100px; text-align: center; border: none }
+    th { text-align: center; border: none;  border-bottom: 1px solid black;}
+    </style>
+    """
+
+    def __init__(self, node: SinglefileData, **kwargs):
+        super().__init__(value=self.DEFAULT_STYLE, **kwargs)
+
+        with node.open(None, "r") as file:
+            header = next(file, "").strip("#")
+
+            self.value += "<table>\n<tr>\n"
+            self.value += "\n".join(f"<th>{head.strip()}</th>" for head in header.split("|"))
+            self.value += "\n</tr>\n"
+
+            for line in file:
+                self.value += "\n<tr>\n"
+                self.value += "\n".join(f"<td>{data}</td>" for data in line.split())
+                self.value += "\n</tr>\n"
+
+            self.value += "\n</table>"
+
+
 AIIDA_VIEWER_MAPPING.update(
     {
         "aiida.calculations:mlip.sp": SummaryViewer,
         "aiida.calculations:mlip.md": SummaryViewer,
         "aiida.calculations:mlip.opt": SummaryViewer,
-        "aiida.calculations:mlip.ph": SummaryViewer,
     }
 )
 
@@ -190,58 +286,27 @@ class CustomAiidaNodeViewWidget(ipw.VBox):
                 return StructureViewWidget(node=node, **kwargs)
             case TrajectoryData():
                 return StructureViewWidget(node=node, **kwargs)
-
-            case SinglefileData(filename="aiida-stats.dat"):
-                with node.open(None, "r") as file:
-                    header = [
-                        "_".join(re.sub(r"\W+", " ", head).strip().split())
-                        for head in next(file, "").strip("#").split("|")
-                    ]
-                    return GenericArrayDataTableWidget.from_file(file, header)
-
-            case SinglefileData(filename="aiida-dos.dat"):
-                with node.open(None, "r") as file:
-                    widget = GenericArrayDataTableWidget.from_file(file, ["Frequency", "Intensity"])
-                widget.x_selector.value = "Frequency"
-                widget.show_selector.value = {"Intensity"}
-                widget.show_plt_btn.click()
-                return widget
-
-            case SinglefileData(filename="aiida-pdos.dat"):
-                with node.open(None, "r") as file:
-                    next(file)
-                    data = next(file).split()
-                    file.seek(0)
-                    return GenericArrayDataTableWidget.from_file(
-                        file,
-                        header=["Frequency", *(f"Atom_{i}" for i, _ in enumerate(data[1:], 1))],
-                    )
-
-            # Don't currently handle this type of file.
-            case SinglefileData(filename="aiida-force_constants.hdf5"):
-                ipw.HTML(f"Cannot currently show contents of {node.filename}")
-
-            case SinglefileData(filename="aiida-auto_bands.yml.xz"):
-                return VibrationalModesViewWidget.from_phonopy_yaml(
-                    node, layout=ipw.Layout(width="100%", min_height="10cm")
-                )
-
             case SinglefileData() if node.filename.endswith((".yaml", ".yml")):
                 with node.open(None, "r") as file:
                     d = yaml.safe_load(file)
                 if isinstance(d.get("info"), dict):
                     d.update(d.pop("info"))
-                return DictViewer(
-                    Dict(d), layout=ipw.Layout(max_height="22em", overflow="scroll hidden")
-                )
-
-            case SinglefileData() if node.filename.endswith((".xyz", ".extxyz")):
+                return DictViewer(Dict(d))
+            case SinglefileData() if node.filename.endswith(".xyz"):
                 return StructureViewWidget(node=node, **kwargs)
-
+            case SinglefileData() if node.filename == "aiida-stats.dat":
+                return AiiDAMLIPStatsViewer(node=node, **kwargs)
             case SinglefileData():
                 viewer = ipw.Output()
                 viewer.append_stdout(node.get_content("r"))
                 return viewer
+            case ArrayData() if "Energy Derivative" in node.label:
+                return AiidaGradientDataViewWidget(node, **kwargs)
+            case ArrayData() if "Vibrational" in node.label:
+                return VibrationalModesViewWidget(node, **kwargs)
+
+            case Float() if "SCF Energy" in node.label:
+                return f"Final SCF Energy (Hartree): {node.value}"
 
             case _ if viewer:
                 return viewer(node, **kwargs)

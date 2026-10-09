@@ -1,5 +1,4 @@
 """Results viewing wizard step."""
-
 import traceback
 
 import ipywidgets as ipw
@@ -117,9 +116,7 @@ class ResultsWizardStep(Step, WizardAppWidgetStep):
             qb = QueryBuilder()
             qb.append(
                 ProcessNode,
-                filters={
-                    "attributes.process_label": {"in": ["Singlepoint", "GeomOpt", "MD", "Phonons"]}
-                },
+                filters={"attributes.process_label": {"in": ["Singlepoint", "GeomOpt", "MD"]}},
                 project=[
                     "id",
                     "ctime",
