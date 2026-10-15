@@ -137,6 +137,7 @@ class RunWizardStep(WizardStep):
             builder.model = model
             builder.arch = orm.Str(self.model.mlip_model.arch)
             builder.device = orm.Str(self.model.mlip_model.device)
+            builder.calc_kwargs = orm.Dict(self.model.mlip_model.calc_kwargs)
 
             builder.metadata.options.resources = {
                 "num_mpiprocs_per_machine": self.model.mlip_model.ncpus,
