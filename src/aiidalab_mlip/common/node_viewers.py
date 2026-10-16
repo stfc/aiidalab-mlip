@@ -20,6 +20,7 @@ from aiidalab_widgets_base.loaders import LoadingWidget
 from aiidalab_widgets_base.viewers import AIIDA_VIEWER_MAPPING, DictViewer
 from alc_aiidalab_widgets.types import CallbackDict
 from alc_aiidalab_widgets.widgets import Status, StructureViewWidget
+from alc_aiidalab_widgets.widgets.extxyz_stats import ExtXYZStatsViewer
 from alc_aiidalab_widgets.widgets.tables import GenericArrayDataTableWidget
 from alc_aiidalab_widgets.widgets.vib_modes import VibrationalModesViewWidget
 from ase import Atoms
@@ -30,6 +31,8 @@ T = TypeVar("T")
 
 
 class SummaryViewer(ipw.VBox):
+    """View summary of job node."""
+
     def __init__(self, node: ProcessNode, **kwargs) -> None:
 
         textbox = ipw.HTML()
@@ -236,7 +239,7 @@ class CustomAiidaNodeViewWidget(ipw.VBox):
                 )
 
             case SinglefileData() if node.filename.endswith((".xyz", ".extxyz")):
-                return StructureViewWidget(node=node, **kwargs)
+                return ExtXYZStatsViewer(node=node, **kwargs)
 
             case SinglefileData():
                 viewer = ipw.Output()
