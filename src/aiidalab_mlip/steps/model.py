@@ -282,7 +282,12 @@ Try: verdi code create core.code.installed --config janus.yml""")
         self.code.options = code_labels
 
         if code_labels:
-            self.code.value = code_labels[0]
+            if "janus" in code_labels:
+                self.code.value = "janus"
+            elif any("janus" in c for c in code_labels):
+                self.code.value = next(c for c in code_labels if "janus" in c)
+            else:
+                self.code.value = code_labels[0]
 
     def update_models(self, _: ipw.Button | None = None) -> None:
         """Update the list of available models."""
