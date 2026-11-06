@@ -6,19 +6,20 @@ build-backend = "setuptools.build_meta"
 name = "aiidalab-mlip"
 version = "0.1.1"
 authors = [
+    {name = "Jacob Wilkins", email = "jacob.wilkins@stfc.ac.uk"},
     {name = "Jessica Gould"},
-    {name = "Jacob Wilkins", email = "jacob.wilkins@stfc.ac.uk"}
+    {name = "Alin M. Elena"}
 ]
 description = "Run MLIPs through AiiDALab."
 readme = "README.md"
 requires-python = ">=3.10,<3.15"
 classifiers = [
-    "License :: OSI Approved :: BSD License",
+    "Framework :: AiiDA",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Development Status :: 1 - Planning"
+    "Development Status :: 4 - Beta"
 ]
-license = {text = "BSD-3-Clause"}
+license = "BSD-3-Clause"
 dependencies = [
     "aiidalab>=26.09.0",
     "aiida-mlip",
@@ -128,3 +129,7 @@ minversion = "7.0"
 testpaths = ["tests"]
 pythonpath = ["src", "."]
 addopts = "-v -p no:pytest-qt"
+
+[tool.aiidalab]
+title = "MLIP"
+categories = ["quantum", "classical"]
