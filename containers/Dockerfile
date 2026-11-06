@@ -12,7 +12,7 @@
 #   podman run -it --rm -p 8888:8888 -v "$HOME":/home/jovyan aiidalab-mlip:latest
 #   (or use ./containers/startup.sh)
 
-FROM aiidalab/full-stack:edge
+FROM docker.io/aiidalab/full-stack:edge
 
 USER root
 
